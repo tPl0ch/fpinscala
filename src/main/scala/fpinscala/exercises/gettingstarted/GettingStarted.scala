@@ -1,5 +1,7 @@
 package fpinscala.exercises.gettingstarted
 
+import scala.annotation.tailrec
+
 // A comment!
 /* Another comment */
 /** A documentation comment */
@@ -17,7 +19,7 @@ object MyProgram:
 
   // A definition of factorial, using a local, tail recursive function
   def factorial(n: Int): Int =
-    @annotation.tailrec
+    @tailrec
     def go(n: Int, acc: Int): Int =
       if n <= 0 then acc
       else go(n-1, n*acc)
@@ -33,7 +35,14 @@ object MyProgram:
 
   // Exercise 1: Write a function to compute the nth fibonacci number
 
-  def fib(n: Int): Int = ???
+  def fib(n: Int): Int =
+    @tailrec
+    def loop(n: Int, cur: Int, next: Int): Int =
+      n match {
+        case 0 => cur
+        case i => loop(n - 1, next, cur + next)
+      }
+    loop(n, 0, 1)
 
   // This definition and `formatAbs` are very similar..
   private def formatFactorial(n: Int) =
@@ -88,7 +97,7 @@ object MonomorphicBinarySearch:
   // First, a findFirst, specialized to `String`.
   // Ideally, we could generalize this to work for any `Array` type.
   def findFirst(ss: Array[String], key: String): Int =
-    @annotation.tailrec
+    @tailrec
     def loop(n: Int): Int =
       // If `n` is past the end of the array, return `-1`
       // indicating the key doesn't exist in the array.
@@ -109,7 +118,7 @@ object PolymorphicFunctions:
   // And instead of hard-coding an equality check for a given key,
   // we take a function with which to test each element of the array.
   def findFirst[A](as: Array[A], p: A => Boolean): Int =
-    @annotation.tailrec
+    @tailrec
     def loop(n: Int): Int =
       if n >= as.length then -1
       // If the function `p` matches the current element,
@@ -121,7 +130,13 @@ object PolymorphicFunctions:
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean =
+    @tailrec
+    def loop(n: Int): Boolean =
+      if n + 1 >= as.length then true
+      else if gt(as(n), as(n + 1)) then false
+      else loop(n + 1)
+    loop(0)
 
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
@@ -134,13 +149,13 @@ object PolymorphicFunctions:
   // Note that `=>` associates to the right, so we could
   // write the return type as `A => B => C`
   def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    ???
+    a => b => f(a, b)
 
   // NB: The `Function2` trait has a `curried` method already
 
   // Exercise 4: Implement `uncurry`
   def uncurry[A,B,C](f: A => B => C): (A, B) => C =
-    ???
+    (a, b) => f(a)(b)
 
   /*
   NB: There is a method on the `Function` object in the standard library,
@@ -156,4 +171,4 @@ object PolymorphicFunctions:
 
   def compose[A,B,C](f: B => C, g: A => B): A => C =
     ???
-
+    a => f(g(a))
