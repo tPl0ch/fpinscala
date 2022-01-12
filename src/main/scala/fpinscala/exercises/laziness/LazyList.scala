@@ -1,5 +1,7 @@
 package fpinscala.exercises.laziness
 
+import fpinscala.exercises.laziness.LazyList.{cons, empty}
+
 import scala.annotation.tailrec
 
 enum LazyList[+A]:
@@ -33,9 +35,17 @@ enum LazyList[+A]:
     case Empty => None
     case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
 
-  def take(n: Int): LazyList[A] = ???
+  def take(n: Int): LazyList[A] =
+    this match
+      case Cons(h, t) if n > 1 => cons(h(), t().take(n - 1))
+      case Cons(h, t) if n == 1 => cons(h(), empty)
+      case _ => empty
 
-  def drop(n: Int): LazyList[A] = ???
+  @annotation.tailrec
+  final def drop(n: Int): LazyList[A] =
+    this match
+      case Cons(_, t) if n > 0 => t().drop(n - 1)
+      case _ => this
 
   def takeWhile(p: A => Boolean): LazyList[A] = ???
 
@@ -67,14 +77,14 @@ object LazyList:
 
   def from(n: Int): LazyList[Int] = ???
 
-  val fibs: LazyList[Int] = ???
+  lazy val fibs: LazyList[Int] = ???
 
   def unfold[A, S](state: S)(f: S => Option[(A, S)]): LazyList[A] = ???
 
-  val fibsViaUnfold: LazyList[Int] = ???
+  lazy val fibsViaUnfold: LazyList[Int] = ???
 
   def fromViaUnfold(n: Int): LazyList[Int] = ???
 
   def continuallyViaUnfold[A](a: A): LazyList[A] = ???
 
-  val onesViaUnfold: LazyList[Int] = ???
+  lazy val onesViaUnfold: LazyList[Int] = ???
