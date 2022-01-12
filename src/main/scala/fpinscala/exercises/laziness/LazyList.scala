@@ -1,10 +1,24 @@
 package fpinscala.exercises.laziness
 
+import scala.annotation.tailrec
+
 enum LazyList[+A]:
   case Empty
   case Cons(h: () => A, t: () => LazyList[A])
 
-  def toList: List[A] = ???
+  def toListRecursive: List[A] =
+    this match
+      case Empty => Nil
+      case Cons(h, t) => h() :: t().toListRecursive
+
+  def toList: List[A] =
+    @tailrec
+    def loop(acc: List[A], l: LazyList[A]): List[A] =
+      l match
+        case Empty => acc.reverse
+        case Cons(h, t) => loop(h() :: acc, t())
+
+    loop(Nil, this)
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
     this match
