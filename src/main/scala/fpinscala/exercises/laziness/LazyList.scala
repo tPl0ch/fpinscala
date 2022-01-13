@@ -113,7 +113,8 @@ object LazyList:
   lazy val fibsViaUnfold: LazyList[Int] =
     unfold((0, 1)) { case (cur, next) =>Some((cur, (next, cur + next))) }
 
-  def fromViaUnfold(n: Int): LazyList[Int] = ???
+  def fromViaUnfold(n: Int): LazyList[Int] =
+    unfold(n)(i => Some((i, i + 1)))
 
   def continuallyViaUnfold[A](a: A): LazyList[A] = ???
 
