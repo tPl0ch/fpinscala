@@ -105,7 +105,11 @@ object LazyList:
 
     loop(0, 1)
 
-  def unfold[A, S](state: S)(f: S => Option[(A, S)]): LazyList[A] = ???
+  def unfold[A, S](state: S)(f: S => Option[(A, S)]): LazyList[A] =
+    f(state) match
+      case Some(a, s) => cons(a, unfold(s)(f))
+      case None => empty
+
 
   lazy val fibsViaUnfold: LazyList[Int] = ???
 
