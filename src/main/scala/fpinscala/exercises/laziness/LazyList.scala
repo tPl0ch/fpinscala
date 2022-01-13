@@ -97,7 +97,7 @@ object LazyList:
     lazy val single: LazyList[A] = cons(a, single)
     single
 
-  def from(n: Int): LazyList[Int] = ???
+  def from(n: Int): LazyList[Int] = cons(n, from(n + 1))
 
   lazy val fibs: LazyList[Int] = ???
 
