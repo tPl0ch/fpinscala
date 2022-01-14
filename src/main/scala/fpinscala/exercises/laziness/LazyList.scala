@@ -61,6 +61,12 @@ enum LazyList[+A]:
   def takeWhileFoldRight(p: A => Boolean): LazyList[A] =
     foldRight(empty[A])((a, b) => if p(a) then cons(a, b) else empty)
 
+  def takeWhileUnfold(p: A => Boolean): LazyList[A] =
+    unfold(this) {
+      case Cons(h, t) if p(h()) => Some((h(), t()))
+      case _ => None
+    }
+  
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => p(a) && b)
 
