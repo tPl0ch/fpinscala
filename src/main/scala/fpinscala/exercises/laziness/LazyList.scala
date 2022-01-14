@@ -95,6 +95,12 @@ enum LazyList[+A]:
     foldRight(empty[B])((a, b) => f(a).append(b))
 
   def startsWith[B](s: LazyList[B]): Boolean = ???
+  
+  def zipWith[B](l: LazyList[B]): LazyList[(A, B)] =
+    unfold((this, l)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some(((h1(), h2()), (t1(), t2())))
+      case _ => None
+    }
 
 
 object LazyList:
