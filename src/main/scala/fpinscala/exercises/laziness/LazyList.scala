@@ -1,6 +1,6 @@
 package fpinscala.exercises.laziness
 
-import fpinscala.exercises.laziness.LazyList.{cons, empty}
+import fpinscala.exercises.laziness.LazyList.{Cons, Empty, cons, empty, unfold}
 
 import scala.annotation.tailrec
 
@@ -66,6 +66,12 @@ enum LazyList[+A]:
 
   def map[B](f: A => B): LazyList[B] =
     foldRight(empty[B])((a, b) => cons(f(a), b))
+
+  def mapUnfold[B](f: A => B): LazyList[B] =
+    unfold(this) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case Empty => None
+    }
 
   def filter(p: A => Boolean): LazyList[A] =
     foldRight(empty[A])((a, b) => if p(a) then cons(a, b) else b)
