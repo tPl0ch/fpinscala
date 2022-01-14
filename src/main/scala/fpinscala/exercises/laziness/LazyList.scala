@@ -118,6 +118,12 @@ enum LazyList[+A]:
       case _ => None
     }
 
+  def tails: LazyList[LazyList[A]] =
+    unfold(this) {
+      case s @ Cons(_, t) => Some((s, t()))
+      case _ => None
+    }.append(LazyList(empty))
+
 object LazyList:
   def cons[A](hd: => A, tl: => LazyList[A]): LazyList[A] = 
     lazy val head = hd
