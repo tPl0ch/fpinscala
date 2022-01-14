@@ -116,6 +116,8 @@ object LazyList:
   def fromViaUnfold(n: Int): LazyList[Int] =
     unfold(n)(i => Some((i, i + 1)))
 
-  def continuallyViaUnfold[A](a: A): LazyList[A] = ???
+  def continuallyViaUnfold[A](a: A): LazyList[A] =
+    unfold(())(_ => Some((a, ())))
 
-  lazy val onesViaUnfold: LazyList[Int] = ???
+  lazy val onesViaUnfold: LazyList[Int] =
+    unfold(())(_ => Some((1, ())))
