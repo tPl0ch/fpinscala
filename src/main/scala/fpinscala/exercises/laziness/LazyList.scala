@@ -124,6 +124,9 @@ enum LazyList[+A]:
       case _ => None
     }.append(LazyList(empty))
 
+  def hasSubsequence[A2 >: A](seq: LazyList[A2]): Boolean =
+    tails.exists(_.startsWith(seq))
+
 object LazyList:
   def cons[A](hd: => A, tl: => LazyList[A]): LazyList[A] = 
     lazy val head = hd
