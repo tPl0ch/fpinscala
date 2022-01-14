@@ -41,6 +41,12 @@ enum LazyList[+A]:
       case Cons(h, t) if n == 1 => cons(h(), empty)
       case _ => empty
 
+  def takeUnfold(n: Int): LazyList[A] =
+    unfold((this, n)) {
+      case (Cons(h, t), n) if n > 0 => Some((h(), (t(), n - 1)))
+      case _ => None
+    }
+
   @annotation.tailrec
   final def drop(n: Int): LazyList[A] =
     this match
