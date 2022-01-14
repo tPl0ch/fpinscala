@@ -66,7 +66,7 @@ enum LazyList[+A]:
       case Cons(h, t) if p(h()) => Some((h(), t()))
       case _ => None
     }
-  
+
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => p(a) && b)
 
@@ -95,13 +95,23 @@ enum LazyList[+A]:
     foldRight(empty[B])((a, b) => f(a).append(b))
 
   def startsWith[B](s: LazyList[B]): Boolean = ???
-  
+
   def zipWith[B](l: LazyList[B]): LazyList[(A, B)] =
     unfold((this, l)) {
       case (Cons(h1, t1), Cons(h2, t2)) => Some(((h1(), h2()), (t1(), t2())))
       case _ => None
     }
 
+  def zipAll[B](l: LazyList[B]): LazyList[(Option[A], Option[B])] =
+    unfold((this, l)) {
+      case (Cons(h1, t1), Cons(h2, t2)) =>
+        Some(((Some(h1()), Some(h2())), (t1(), t2())))
+      case (Cons(h1, t1), Empty) =>
+        Some(((Some(h1()), None), (t1(), empty)))
+      case (Empty, Cons(h2, t2)) =>
+        Some(((None, Some(h2())), (empty, t2())))
+      case _ => None
+    }
 
 object LazyList:
   def cons[A](hd: => A, tl: => LazyList[A]): LazyList[A] = 
