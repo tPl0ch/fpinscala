@@ -65,7 +65,12 @@ object RNG:
 
     produce(0, Nil, rng)
 
-  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    rng => {
+      val (a, nextA) = ra(rng)
+      val (b, nextB) = rb(nextA)
+      (f(a, b), nextB)
+    }
 
   def sequence[A](rs: List[Rand[A]]): Rand[List[A]] = ???
 
