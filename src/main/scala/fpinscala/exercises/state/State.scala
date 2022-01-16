@@ -52,7 +52,15 @@ object RNG:
     val (d3, next3) = double(next2)
     ((d1, d2, d3), next3)
 
-  def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) =
+    @tailrec
+    def produce(cur: Int, l: List[Int], rng: RNG): (List[Int], RNG) =
+      if cur < count then {
+        val (i, next) = rng.nextInt
+        produce(cur + 1, i :: l, next)
+      } else (l, rng)
+
+    produce(0, Nil, rng)
 
   def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
 
