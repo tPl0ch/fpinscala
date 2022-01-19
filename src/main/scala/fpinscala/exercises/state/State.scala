@@ -1,5 +1,7 @@
 package fpinscala.exercises.state
 
+import fpinscala.exercises.state.RNG.{Rand, map2, unit}
+
 import scala.annotation.tailrec
 
 
@@ -105,15 +107,28 @@ object State:
     def run(s: S): (A, S) = underlying(s)
 
     def map[B](f: A => B): State[S, B] =
-      ???
+      underlying.flatMap(a => unit(f(a)))
 
     def map2[B, C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
-      ???
+      for {
+        a <- underlying
+        b <- sb
+      } yield f(a, b)
 
     def flatMap[B](f: A => State[S, B]): State[S, B] =
-      ???
+      s => {
+        val (a, next) = run(s)
+        f(a)(next)
+      }
+
+  extension [S, A](underlying: Seq[State[S, A]])
+    def sequence: State[S, Seq[A]] =
+      underlying.foldRight(unit(Seq[A]()))((r, acc) => r.map2(acc)(_ +: _))
 
   def apply[S, A](f: S => (A, S)): State[S, A] = f
+
+  def unit[S, A](a: A): State[S, A] = s => (a, s)
+
 
 enum Input:
   case Coin, Turn
