@@ -129,6 +129,19 @@ object State:
 
   def unit[S, A](a: A): State[S, A] = s => (a, s)
 
+  def modify[S](f: S => S): State[S, Unit] =
+    for
+      s <- get
+      _ <- set(f(s))
+    yield ()
+
+  def get[S]: State[S, S] = s => (s, s)
+
+  def set[S](s: S): State[S, Unit] = _ => ((), s)
+
+  def traverse[S, A, B](as: List[A])(f: A => State[S, B]): State[S, List[B]] =
+    as.foldRight(unit[S, List[B]](Nil))((a, acc) => f(a).map2(acc)(_ :: _))
+
 
 enum Input:
   case Coin, Turn
@@ -136,4 +149,17 @@ enum Input:
 case class Machine(locked: Boolean, candies: Int, coins: Int)
 
 object Candy:
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+  import State.*
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
+    val transitions: Input => Machine => Machine = (input: Input) => (machine: Machine) => (input, machine) match
+      case (Input.Coin, Machine(locked, candies, coins)) if locked && candies > 0 =>
+        Machine(false, candies, coins + 1)
+      case (Input.Turn, Machine(locked, candies, coins)) if !locked && candies > 0 =>
+        Machine(true, candies - 1, coins)
+      case (_, m) => m
+
+    for
+      _ <- State.traverse(inputs)(i => State.modify(transitions(i)))
+      s <- get[Machine]
+    yield (s.coins, s.candies)
